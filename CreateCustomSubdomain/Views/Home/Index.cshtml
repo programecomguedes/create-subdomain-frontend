@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style type="text/css">
+    form {
+        padding-top: 10px;
+    }
+
+    input[type=text] {
+        border: 1px #CCC solid;
+        border-radius: 5px;
+        padding: 10px;
+        width: 300px;
+    }
+
+    button {
+        border: 1px #CCC solid;
+        border-radius: 5px;
+        text-transform: uppercase;
+        font-weight: 600;
+        padding: 10px;
+    }
+</style>
+
+<div class="text-center">
+    <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="CreateSubdomain">
+        <input type="text" id="subdomain" name="subdomain" />
+        <button type="submit">Criar Subdomínio</button>
+    </form>
+</div>
