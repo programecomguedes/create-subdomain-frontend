@@ -42,27 +42,5 @@ az webapp config hostname add --webapp-name {{WEBAPP_NAME_HERE}} --resource-grou
 ```
 
 ## Azure Logic App
-Request Body JSON Schema do Http Request:
-```
-{
-    "subdomain": "www"
-}
-```
 
-Schema do Parse JSON:
-```
-{
-    "properties": {
-        "subdomain": {
-            "type": "string"
-        }
-    },
-    "type": "object"
-}
-```
-
-Name do Initialize variable: **subdomain**
-
-Type do do Initialize variable: **String**
-
-Value do Initialize variable: **subdomain**
+<img src="https://user-images.githubusercontent.com/15362349/142265258-3601834f-22d3-4f81-af1d-bdd71a771d9f.png" width="500">
