@@ -12,33 +12,42 @@ Pré-requisitos para utilização:
 - Criar um Logic App
 - Editar método "CreateSubdomain" no "HomeController" com o endpoint responsável pela criação do subdomínio.
 
-Gerar um Service Principal para autenticação no Azure Automation:
-```
-az ad sp create-for-rbac --name SubdomainServicePrincipalName
-```
-
-A execução do código acima deverá gerar um resultado semelhante ao que segue abaixo:
-```
-{
-  "appId": "xxxxf1d7-xxxx-4e75-9dxx-xxxc6cd6xxxx",
-  "displayName": "SubdomainServicePrincipalName",
-  "name": "xxxxf1d7-xx5f-xx75-xxxx-0afc6cd6xxxx",
-  "password": "XXXXBSkDAtX8.XxH7-XXXTnX.Rp7fXxXX",
-  "tenant": "Xxxcf1XX-46XX-40e5-acXX-f23b4501XXxx"
-}
-```
-
 Código responsável por criar um subdomínio a partir do Azure Automation:
 ```
 Param($subdomain)
 
-az login --service-principal -u "{{APP_ID_HERE}}" -p "{{PASSWORD_HERE}}" --tenant "{{TENANT_HERE}}"
+$connectionName = "AzureRunAsConnection"
 
-az network dns record-set txt add-record --resource-group "{{RESOURCE_GROUP_HERE}}" --zone-name {{DOMAIN_HERE}} --record-set-name "asuid.$($subdomain)"--value "{{TXT_VALUE_HERE}}"
+# Get the connection "AzureRunAsConnection "
+$servicePrincipalConnection=Get-AutomationConnection -Name $connectionName         
 
-az network dns record-set cname set-record --resource-group "{{RESOURCE_GROUP_HERE}}" --zone-name {{DOMAIN_HERE}} --record-set-name $subdomain --cname {{WEBAPP_NAME_HERE}}.azurewebsites.net
+Connect-AzAccount `
+    -ServicePrincipal `
+    -TenantId $servicePrincipalConnection.TenantId `
+    -ApplicationId $servicePrincipalConnection.ApplicationId `
+    -CertificateThumbprint $servicePrincipalConnection.CertificateThumbprint
 
-az webapp config hostname add --webapp-name {{WEBAPP_NAME_HERE}} --resource-group "{{RESOURCE_GROUP_HERE}}" --hostname "$($subdomain).{{DOMAIN_HERE}}"
+# Set DNS TXT Value
+New-AzDnsRecordSet -ZoneName {{DNS_ZONE_NAME_HERE}} -ResourceGroupName {{RESOURCE_GROUP_HERE}} `
+ -Name "asuid.$($subdomain)" -RecordType "txt" -Ttl 3600 `
+ -DnsRecords (New-AzDnsRecordConfig -Value  "{{TXT_VALUE_HERE}}")
+ 
+# Set DNS CNAME Value
+New-AzDnsRecordSet -ZoneName {{DNS_ZONE_NAME_HERE}} -ResourceGroupName "{{RESOURCE_GROUP_HERE}}" `
+ -Name $subdomain -RecordType "CNAME" -Ttl 3600 `
+ -DnsRecords (New-AzDnsRecordConfig -cname "{{WEB_APP_NAME}}.azurewebsites.net")
+
+# Get All custom domains of the web app
+$webApp = Get-AzWebApp -ResourceGroupName {{RESOURCE_GROUP_HERE}} -Name {{WEB_APP_NAME}}
+$hostNames = $webApp.HostNames 
+
+# Add a new custom domain
+$hostNames.Add("$subdomain.{{DNS_ZONE_NAME_HERE}}")
+
+# Set custom domains
+Set-AzWebApp -Name {{WEB_APP_NAME}} `
+ -ResourceGroupName {{RESOURCE_GROUP_HERE}} `
+ -HostNames @($hostNames)
 ```
 
 ## Azure Logic App
