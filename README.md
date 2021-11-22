@@ -53,3 +53,7 @@ Set-AzWebApp -Name {{WEB_APP_NAME}} `
 ## Azure Logic App
 
 <img src="https://user-images.githubusercontent.com/15362349/142265258-3601834f-22d3-4f81-af1d-bdd71a771d9f.png" width="500">
+
+## Assista no YouTube:
+- [Criando domínios customizados no Azure com .NET Core (Parte 1/2)](https://youtu.be/VJp3mKLPe8k)
+- [Criando domínios customizados no Azure com .NET Core (Parte 2/2)](https://youtu.be/xzbxJHMiD2Y)
