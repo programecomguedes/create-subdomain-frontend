@@ -10,7 +10,9 @@ Pré-requisitos para utilização:
 - Configuração de Web App para exibição a partir do domínio registrado em Registro.BR
 - Criar um Azure Automation
 - Criar um Logic App
-- Editar método "CreateSubdomain" no "HomeController" com o endpoint responsável pela criação do subdomínio.
+- Editar método "Create
+
+" no "HomeController" com o endpoint responsável pela criação do subdomínio.
 
 Código responsável por criar um subdomínio a partir do Azure Automation:
 ```
@@ -48,6 +50,13 @@ $hostNames.Add("$subdomain.{{DNS_ZONE_NAME_HERE}}")
 Set-AzWebApp -Name {{WEB_APP_NAME}} `
  -ResourceGroupName {{RESOURCE_GROUP_HERE}} `
  -HostNames @($hostNames)
+ 
+# SSL binding
+New-AzWebAppCertificate -ResourceGroupName {{RESOURCE_GROUP_HERE}} `
+ -WebAppName "{{WEB_APP_NAME}}" `
+ -Name "$($subdomain)Cert"  `
+ -HostName "$($subdomain).{{DNS_ZONE_NAME_HERE}}" `
+ -AddBinding
 ```
 
 ## Azure Logic App
